@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fractional Knapsack Simulator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <style>
+    :root {
+      /* Light theme color scheme */
+      --bg-gradient-start: #f8f9fa;
+      --bg-gradient-end: #e9ecef;
+      --card-bg: #ffffff;
+      --card-header: #f1f3f5;
+      --text-primary: #212529;
+      --text-secondary: #495057;
+      --text-muted: #6c757d;
+      --accent-primary: #0d6efd;
+      --accent-secondary: #0b5ed7;
+      --accent-tertiary: #0a58ca;
+      --success: #198754;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --border-color: #dee2e6;
+      --input-bg: #ffffff;
+      --input-border: #ced4da;
+      --input-text: #212529;
+      --input-placeholder: #6c757d;
+      --transition-speed: 0.25s;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      min-height: 100vh;
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      padding: 0;
+    }
+
+    .app-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .app-title {
+      font-weight: 800;
+      font-size: 2.25rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+    }
+
+    .app-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 0;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      background-color: var(--card-header);
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 1rem 1.5rem;
+      border-radius: 1rem 1rem 0 0 !important;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .form-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--input-text);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      transition: all var(--transition-speed);
+    }
+
+    .form-control:focus, .form-select:focus {
+      background-color: var(--input-bg);
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+      color: var(--input-text);
+    }
+
+    .form-control::placeholder {
+      color: var(--input-placeholder);
+    }
+
+    /* Fix dropdown text color */
+    .form-select option {
+      color: var(--text-primary);
+    }
+
+    .btn {
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      transition: all var(--transition-speed);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border: none;
+      color: white;
+    }
+
+    .btn-primary:hover, .btn-primary:focus {
+      background: linear-gradient(90deg, var(--accent-tertiary), var(--accent-primary));
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+      color: white;
+    }
+
+    .btn-success {
+      background: linear-gradient(90deg, #157347, var(--success));
+      border: none;
+      color: white;
+    }
+
+    .btn-success:hover, .btn-success:focus {
+      background: linear-gradient(90deg, #146c43, #198754);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+      color: white;
+    }
+
+    .btn-danger {
+      background: linear-gradient(90deg, #bb2d3b, var(--danger));
+      border: none;
+      color: white;
+    }
+
+    .btn-danger:hover, .btn-danger:focus {
+      background: linear-gradient(90deg, #b02a37, #dc3545);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+      color: white;
+    }
+
+    .btn i {
+      margin-right: 0.5rem;
+    }
+
+    /* Strategy Info Box */
+    .strategy-info {
+      background-color: rgba(13, 110, 253, 0.1);
+      border-left: 4px solid var(--accent-primary);
+      padding: 1rem 1.25rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    .strategy-info strong {
+      color: var(--accent-primary);
+    }
+
+    /* Animation Area */
+    .animation-area {
+      position: relative;
+      height: 80px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .float-item {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -60px;
+      opacity: 0;
+      transition: top 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                  opacity 0.8s ease;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+      z-index: 10;
+    }
+
+    .float-item.show {
+      top: 10px;
+      opacity: 1;
+    }
+
+    /* Table Styling */
+    .table {
+      margin-bottom: 0;
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    .table thead th {
+      background-color: var(--card-header);
+      color: var(--text-primary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem;
+    }
+
+    .table td {
+      padding: 1rem;
+      border-color: var(--border-color);
+      vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+
+    /* 3D Knapsack Visualization */
+    .knapsack-container {
+      perspective: 1000px;
+      margin: 1rem auto;
+      width: 300px;
+      height: 300px;
+      position: relative;
+    }
+
+    .knapsack-3d {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateX(10deg) rotateY(-20deg);
+      transition: transform 1s ease;
+    }
+
+    .knapsack-3d:hover {
+      transform: rotateX(15deg) rotateY(-25deg);
+    }
+
+    .bag-top {
+      position: absolute;
+      width: 220px;
+      height: 200px;
+      background: linear-gradient(135deg, #704214, #8B4513);
+      border-radius: 15px 15px 0 0;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .bag-front {
+      position: absolute;
+      width: 220px;
+      height: 60px;
+      background: linear-gradient(to bottom, #8B4513, #704214);
+      border-radius: 0 0 100px 100px;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateZ(10px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .bag-handle {
+      position: absolute;
+      width: 140px;
+      height: 40px;
+      border: 6px solid #5D370C;
+      border-bottom: none;
+      border-radius: 70px 70px 0 0;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .bag-content {
+      position: absolute;
+      width: 200px;
+      height: 180px;
+      left: 10px;
+      top: 10px;
+      overflow: hidden;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .knapsack-item {
+      position: absolute;
+      width: 100%;
+      left: 0;
+      color: white;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0.5rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .knapsack-item.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Metrics Display */
+    .metrics-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .metric-card {
+      flex: 1;
+      min-width: 150px;
+      background: linear-gradient(135deg, var(--card-header), var(--card-bg));
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
+    }
+
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+      color: var(--text-primary);
+    }
+
+    .metric-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Results Table */
+    .results-table {
+      margin-top: 1.5rem;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
+    }
+
+    .fraction-badge {
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Remove button style */
+    .remove-btn {
+      color: var(--danger);
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .remove-btn:hover {
+      background-color: rgba(220, 53, 69, 0.1);
+      transform: scale(1.1);
+    }
+
+    /* Summary Cards */
+    .summary-cards {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .summary-card {
+      flex: 1;
+      padding: 1.25rem;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .summary-card.profit {
+      background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(25, 135, 84, 0.05));
+      border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+
+    .summary-card.capacity {
+      background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(13, 110, 253, 0.05));
+      border: 1px solid rgba(13, 110, 253, 0.2);
+    }
+
+    .summary-icon {
+      font-size: 2rem;
+      opacity: 0.9;
+    }
+
+    .summary-card.profit .summary-icon {
+      color: var(--success);
+    }
+
+    .summary-card.capacity .summary-icon {
+      color: var(--accent-primary);
+    }
+
+    .summary-content h4 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.25rem 0;
+    }
+
+    .summary-content p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Glow effects */
+    .glow-effect {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glow-effect::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .glow-effect:hover::before {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .app-title {
+        font-size: 1.75rem;
+      }
+      
+      .app-subtitle {
+        font-size: 1rem;
+      }
+      
+      .metrics-container {
+        flex-direction: column;
+      }
+      
+      .summary-cards {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="app-header">
+      <h1 class="app-title">Fractional Knapsack Simulator</h1>
+      <p class="app-subtitle">Interactive algorithm visualization for optimization problems</p>
+    </div>
+    
+    <div class="card glow-effect">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-box2-fill me-2"></i> Configure Items</span>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <label class="form-label">Item Name</label>
+            <input type="text" class="form-control" id="name" placeholder="e.g., Gold" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Weight</label>
+            <input type="number" class="form-control" id="weight" placeholder="e.g., 2" min="0.1" step="0.1" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Profit</label>
+            <input type="number" class="form-control" id="profit" placeholder="e.g., 10" min="0.1" step="0.1" />
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-success w-100" onclick="addItem()">
+              <i class="bi bi-plus-lg"></i> Add Item
+            </button>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Knapsack Capacity</label>
+            <input type="number" class="form-control" id="capacityInput" placeholder="Maximum weight capacity" min="0.1" step="0.1" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Selection Strategy</label>
+            <select id="strategy" class="form-select" onchange="updateStrategyInfo()">
+              <option value="ratio">By Profit/Weight Ratio (Optimal)</option>
+              <option value="profit">By Profit (Highest First)</option>
+              <option value="weight">By Weight (Lightest First)</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="strategyInfo" class="strategy-info">
+          <strong>Profit/Weight Ratio:</strong> Selects items with highest profit per unit weight first (optimal solution).
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary flex-fill" onclick="runSimulation()">
+            <i class="bi bi-play-fill"></i> Run Simulation
+          </button>
+          <button class="btn btn-danger flex-fill" onclick="resetAll()">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="animation-area" id="animationArea"></div>
+
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card glow-effect h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-list-ul me-2"></i> Available Items</span>
+            <span class="badge bg-primary rounded-pill" id="itemCount">0 items</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Weight</th>
+                    <th>Profit</th>
+                    <th>P/W Ratio</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="itemTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card glow-effect h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-bag-fill me-2"></i> Knapsack Visualization</span>
+          </div>
+          <div class="card-body">
+            <div class="knapsack-container">
+              <div class="knapsack-3d">
+                <div class="bag-handle"></div>
+                <div class="bag-top">
+                  <div class="bag-content" id="knapsack"></div>
+                </div>
+                <div class="bag-front"></div>
+              </div>
+            </div>
+            
+            <div class="metrics-container">
+              <div class="metric-card">
+                <div class="metric-label">Total Profit</div>
+                <div class="metric-value" id="totalProfit">0</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Capacity Used</div>
+                <div class="metric-value" id="capacityDisplay">0 / 0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card glow-effect mt-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark-bar-graph me-2"></i> Simulation Results</span>
+      </div>
+      <div class="card-body">
+        <div id="output" class="text-center">
+          <p class="text-muted">Run the simulation to see results</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let items = [];
+    let nameInput = document.getElementById("name");
+    let weightInput = document.getElementById("weight");
+    let profitInput = document.getElementById("profit");
+
+    // Focus on name input on page load
+    nameInput.focus();
+
+    function getColor(index) {
+      const colors = ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6610f2', '#fd7e14'];
+      return colors[index % colors.length];
+    }
+
+    function updateStrategyInfo() {
+      const strategy = document.getElementById("strategy").value;
+      const infoDiv = document.getElementById("strategyInfo");
+      
+      if (strategy === "ratio") {
+        infoDiv.innerHTML = "<strong>Profit/Weight Ratio:</strong> Selects items with highest profit per unit weight first (optimal solution).";
+      } else if (strategy === "profit") {
+        infoDiv.innerHTML = "<strong>By Profit:</strong> Selects most profitable items first, regardless of weight (may not be optimal).";
+      } else if (strategy === "weight") {
+        infoDiv.innerHTML = "<strong>By Weight:</strong> Selects lightest items first (may not be optimal).";
+      }
+    }
+
+    function updateItemCount() {
+      document.getElementById("itemCount").textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+    }
+
+    function addItem() {
+      const name = nameInput.value.trim();
+      const weight = parseFloat(weightInput.value);
+      const profit = parseFloat(profitInput.value);
+
+      if (!name || isNaN(weight) || isNaN(profit) || weight <= 0 || profit <= 0) {
+        alert("Please enter valid item name, weight, and profit.");
+        return;
+      }
+
+      const ratio = (profit / weight).toFixed(2);
+      const itemId = Date.now().toString();
+      items.push({ id: itemId, name, weight, profit, ratio });
+
+      refreshItemTable();
+      
+      const floatDiv = document.createElement("div");
+      floatDiv.className = "float-item";
+      floatDiv.textContent = `${name} Added`;
+      document.getElementById("animationArea").appendChild(floatDiv);
+
+      setTimeout(() => floatDiv.classList.add("show"), 100);
+      setTimeout(() => floatDiv.remove(), 2000);
+
+      nameInput.value = '';
+      weightInput.value = '';
+      profitInput.value = '';
+      nameInput.focus();
+      updateItemCount();
+    }
+    
+    function removeItem(itemId) {
+      const index = items.findIndex(item => item.id === itemId);
+      if (index !== -1) {
+        const itemName = items[index].name;
+        items.splice(index, 1);
+        refreshItemTable();
+        
+        const floatDiv = document.createElement("div");
+        floatDiv.className = "float-item";
+        floatDiv.style.background = "linear-gradient(90deg, #bb2d3b, #dc3545)";
+        floatDiv.textContent = `${itemName} Removed`;
+        document.getElementById("animationArea").appendChild(floatDiv);
+
+        setTimeout(() => floatDiv.classList.add("show"), 100);
+        setTimeout(() => floatDiv.remove(), 2000);
+        updateItemCount();
+      }
+    }
+    
+    function refreshItemTable() {
+      const table = document.getElementById("itemTable");
+      table.innerHTML = '';
+      
+      if (items.length === 0) {
+        const emptyRow = document.createElement("tr");
+        emptyRow.innerHTML = `<td colspan="5" class="text-center py-4">No items added yet</td>`;
+        table.appendChild(emptyRow);
+      } else {
+        items.forEach(item => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.weight}</td>
+            <td>${item.profit}</td>
+            <td>${item.ratio}</td>
+            <td>
+              <div class="remove-btn">
+                <i class="bi bi-trash" onclick="removeItem('${item.id}')"></i>
+              </div>
+            </td>
+          `;
+          table.appendChild(row);
+        });
+      }
+    }
+
+    function resetAll() {
+      items = [];
+      refreshItemTable();
+      nameInput.value = '';
+      weightInput.value = '';
+      profitInput.value = '';
+      document.getElementById('capacityInput').value = '';
+      document.getElementById('strategy').value = 'ratio';
+      updateStrategyInfo();
+      document.getElementById('knapsack').innerHTML = '';
+      document.getElementById('totalProfit').textContent = '0';
+      document.getElementById('capacityDisplay').textContent = '0 / 0';
+      document.getElementById('output').innerHTML = '<p class="text-muted">Run the simulation to see results</p>';
+      // Clear the animation area
+      document.getElementById('animationArea').innerHTML = '';
+      updateItemCount();
+    }
+
+    function runSimulation() {
+      const capacity = parseFloat(document.getElementById("capacityInput").value);
+      const strategy = document.getElementById("strategy").value;
+      
+      if (isNaN(capacity) || capacity <= 0) {
+        alert("Please enter a valid capacity.");
+        return;
+      }
+
+      if (items.length === 0) {
+        alert("Please add at least one item to the knapsack.");
+        return;
+      }
+
+      const sortedItems = [...items].map((item, index) => ({ ...item, originalIndex: index }));
+      
+      if (strategy === "ratio") {
+        sortedItems.sort((a, b) => (b.profit / b.weight) - (a.profit / a.weight));
+      } else if (strategy === "profit") {
+        sortedItems.sort((a, b) => b.profit - a.profit);
+      } else if (strategy === "weight") {
+        sortedItems.sort((a, b) => a.weight - b.weight);
+      }
+
+      let remaining = capacity;
+      let knapsackDiv = document.getElementById("knapsack");
+      knapsackDiv.innerHTML = '';
+      
+      let totalProfit = 0;
+      let takenItems = [];
+
+      const floatDiv = document.createElement("div");
+      floatDiv.className = "float-item";
+      floatDiv.textContent = "Simulation Running...";
+      document.getElementById("animationArea").appendChild(floatDiv);
+      setTimeout(() => floatDiv.classList.add("show"), 100);
+      
+      for (let item of sortedItems) {
+        if (remaining <= 0) break;
+
+        let fraction = 0;
+        if (item.weight <= remaining) {
+          fraction = 1;
+          remaining -= item.weight;
+        } else {
+          fraction = remaining / item.weight;
+          remaining = 0;
+        }
+        
+        const profitContribution = item.profit * fraction;
+        totalProfit += profitContribution;
+        
+        takenItems.push({
+          ...item,
+          fraction,
+          profitAdded: profitContribution
+        });
+      }
+
+        document.getElementById("capacityDisplay").textContent = `${(capacity - remaining).toFixed(1)} / ${capacity}`;
+        document.getElementById("totalProfit").textContent = totalProfit.toFixed(1);
+        
+        const totalWeight = capacity - remaining;
+        let accumulatedHeight = 0;
+        
+        // Clear the knapsack first
+        knapsackDiv.innerHTML = '';
+        
+        // Calculate total height needed for all items
+        const totalHeight = 180; // Fixed height of the bag content area
+        let totalFractionalWeight = takenItems.reduce((sum, item) => sum + (item.weight * item.fraction), 0);
+        
+        takenItems.forEach((item, index) => {
+          // Calculate item height based on its proportion of the total weight
+          const itemHeight = Math.max(20, (item.weight * item.fraction / totalFractionalWeight) * totalHeight);
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'knapsack-item';
+          itemDiv.textContent = `${item.name} (${(item.fraction * 100).toFixed(1)}%)`;
+          itemDiv.style.height = `${itemHeight}px`;
+          itemDiv.style.bottom = `${accumulatedHeight}px`;
+          itemDiv.style.background = getColor(item.originalIndex);
+          
+          // Ensure text is readable by adjusting font size for small items
+          if (itemHeight < 30) {
+            itemDiv.style.fontSize = '0.7rem';
+            itemDiv.style.padding = '0.25rem';
+          }
+          
+          knapsackDiv.appendChild(itemDiv);
+          accumulatedHeight += itemHeight;
+
+          setTimeout(() => {
+            itemDiv.classList.add('show');
+          }, index * 100);
+        });
+
+      let outputHtml = `
+        <div class="results-table">
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Weight</th>
+                <th>Profit</th>
+                <th>Fraction</th>
+                <th>Profit Added</th>
+              </tr>
+            </thead>
+            <tbody>`;
+      
+      for (let t of takenItems) {
+        outputHtml += `<tr>
+                        <td>${t.name}</td>
+                        <td>${t.weight}</td>
+                        <td>${t.profit}</td>
+                        <td><span class="fraction-badge">${(t.fraction * 100).toFixed(1)}%</span></td>
+                        <td>${t.profitAdded.toFixed(2)}</td>
+                      </tr>`;
+      }
+      
+      outputHtml += `</tbody></table></div>
+        <div class="summary-cards">
+          <div class="summary-card profit">
+            <div class="summary-icon">
+              <i class="bi bi-graph-up"></i>
+            </div>
+            <div class="summary-content">
+              <h4>${totalProfit.toFixed(2)}</h4>
+              <p>Total Profit</p>
+            </div>
+          </div>
+          <div class="summary-card capacity">
+            <div class="summary-icon">
+              <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="summary-content">
+              <h4>${(capacity - remaining).toFixed(2)}</h4>
+              <p>Capacity Used</p>
+            </div>
+          </div>
+        </div>`;
+
+      document.getElementById("output").innerHTML = outputHtml;
+    }
+  </script>
+</body>
+</html>
